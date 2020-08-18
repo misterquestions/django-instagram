@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block head_content %}
+<title>@{{ request.user.username }} | Update profiles</title>
+{% endblock %}
+
+{% block container %}
+<div class="container">
+    <div class="row justify-content-md-center">
+        <div class="col-6 p-4" id="profile-box">
+            {% for message in messages %}
+                <p class="alert alert-success">{{ message }}</p>
+            {% endfor %}
+
+            <form action="{% url 'update_profile' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="media">
+                    {% if profile.profile_picture %}
+                        <img src="{{ profile.profile_picture.url }}" class="rounded-circle" height="50"/>
+                    {% else %}
+                        <img src="{% static 'img/default-avatar.png' %}" class="rounded-circle" height="50"/>
+                    {% endif %}
+
+                    <div class="media-body">
+                        <h5 class="ml-4">@{{ user.username }} | {{ user.get_full_name }}</h5>
+                        <p class="ml-4"><input type="file" name="profile_picture"></p>
+                    </div>
+                </div>
+
+                {% for error in form.profile_picture.errors %}
+                    <div class="alert alert-danger">
+                        <b>Picture: {{ error }}</b>
+                    </div>
+                {% endfor %}
+
+                <hr><br>
+
+                <div class="form-group">
+                    <label>Website</label>
+                    <input
+                        class="form-control {% if form.web_site.errors %}is-invalid{% endif %}"
+                        type="url"
+                        name="web_site"
+                        placeholder="Website"
+                        value="{% if form.errors %}{{ form.web_site.value }}{% else %}{{ profile.web_site }}{% endif %}"
+                    />
+                    <div class="invalid-feedback">
+                        {% for error in form.web_site.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Biography</label>
+                    <textarea
+                        class="form-control {% if form.biography.errors %}is-invalid{% endif %}"
+                        name="biography"
+                    >{% if form.errors %}{{ form.biography.value }}{% else %}{{ profile.biography }}{% endif %}</textarea>
+
+                    <div class="invalid-feedback">
+                        {% for error in form.biography.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Phone number</label>
+                    <input
+                        class="form-control {% if form.phone_number.errors %}is-invalid{% endif %}"
+                        type="text"
+                        name="phone_number"
+                        placeholder="Phone number"
+                        value="{% if form.errors %}{{ form.phone_number.value }}{% else %}{{ profile.phone_number }}{% endif %}"
+                    />
+
+                    <div class="invalid-feedback">
+                        {% for error in form.phone_number.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block mt-5">Update info</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
